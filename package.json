@@ -9,8 +9,8 @@
   "scripts": {
     "pre-install": "npm install --ignore-engines",
     "start": "run-p start:*",
-    "start:client": "npm -w ../pokedex-test-app/client start",
-    "start:server": "npm -w ../pokedex-test-app/server start",
+    "start:client": "npm -w client start",
+    "start:server": "npm -w server start",
     "test:cypress:ui": "cypress open",
     "test:playwright": "playwright test",
     "test:playwright:ui": "playwright test --ui",
