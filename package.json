@@ -10,7 +10,7 @@
     "pre-install": "npm install --ignore-engines",
     "start": "run-p start:*",
     "start:client": "npm -w client start",
-    "start:server": "npm -w server start",
+    "start:server": "npm -w server run build && npm -w server start",
     "test:cypress:ui": "cypress open",
     "test:playwright": "playwright test",
     "test:playwright:ui": "playwright test --ui",
