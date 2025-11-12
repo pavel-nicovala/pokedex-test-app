@@ -1,6 +1,6 @@
 # sdet-frontend-test
 
-A PokéDex application built with React, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress.
+A PokéDex application built with React and TypeScript, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress. The application consists of a TypeScript React frontend and a TypeScript Express backend API.
 
 ## 📋 Table of Contents
 
@@ -11,6 +11,9 @@ A PokéDex application built with React, featuring a search interface for Pokém
 - [Project Structure](#project-structure)
 - [Acceptance Criteria](#acceptance-criteria)
 - [Technologies](#technologies)
+- [API Documentation](#api-documentation)
+- [Development Scripts](#development-scripts)
+- [TypeScript](#typescript)
 
 ## Prerequisites
 
@@ -31,14 +34,41 @@ A PokéDex application built with React, featuring a search interface for Pokém
 
 ## Running the Application
 
-Start both the client and server:
+### Start Both Client and Server
+
+Start both the client and server simultaneously:
 ```bash
 npm start
 ```
 
 This will start:
 - **Client**: React application on `http://localhost:3000`
-- **Server**: Express API server on `http://localhost:3001`
+- **Server**: Express API server on `http://localhost:3001` (automatically builds TypeScript before starting)
+
+### Development Mode
+
+For development with hot-reload on the server:
+```bash
+# Terminal 1: Start client
+cd client
+npm start
+
+# Terminal 2: Start server in dev mode
+cd server
+npm run dev
+```
+
+The server dev mode uses `tsx` for direct TypeScript execution without compilation.
+
+### Build for Production
+
+Build the server TypeScript code:
+```bash
+cd server
+npm run build
+```
+
+The compiled JavaScript will be output to `server/dist/`.
 
 The application uses npm workspaces to manage the client and server as separate packages.
 
@@ -60,11 +90,27 @@ npx cypress run
 
 ```
 sdet-frontend-test/
-├── client/          # React frontend application
-├── server/          # Express backend API
-├── cypress/         # E2E tests
-│   └── e2e/        # Test specifications
-└── cypress.config.js # Cypress configuration
+├── client/                    # React frontend application (TypeScript)
+│   ├── src/
+│   │   ├── api/               # API client functions (.ts)
+│   │   ├── *.tsx              # React components
+│   │   └── types.ts           # TypeScript type definitions
+│   ├── tsconfig.json          # TypeScript configuration
+│   └── package.json
+├── server/                     # Express backend API (TypeScript)
+│   ├── src/
+│   │   ├── index.ts           # Server entry point
+│   │   ├── pokeapi.ts         # GraphQL client wrapper
+│   │   ├── queries.ts         # API route handlers
+│   │   └── types.ts           # TypeScript type definitions
+│   ├── dist/                  # Compiled JavaScript (generated)
+│   ├── tsconfig.json          # TypeScript configuration
+│   └── package.json
+├── cypress/                    # E2E tests
+│   └── e2e/                   # Test specifications
+├── cypress.config.js          # Cypress configuration
+├── openapi.yaml               # OpenAPI 3.0 specification
+└── package.json               # Root workspace configuration
 ```
 
 ## Acceptance Criteria
@@ -95,10 +141,43 @@ After selecting a result, the user is taken to a details page with:
 
 ## Technologies
 
-- **Frontend**: React 17, React Router v6, React Scripts
-- **Backend**: Express.js, Node.js
+- **Frontend**: 
+  - React 17 with TypeScript
+  - React Router v6
+  - React Scripts (Webpack)
+  - TypeScript 4.9.5
+- **Backend**: 
+  - Express.js with TypeScript
+  - Node.js (ES Modules)
+  - TypeScript 4.5.2
+  - GraphQL client (PokeAPI)
 - **Testing**: Cypress 15.6.0
-- **Build Tools**: Webpack (via react-scripts)
+- **API Documentation**: OpenAPI 3.0.3 (see `openapi.yaml`)
+
+## API Documentation
+
+The API is documented using OpenAPI 3.0.3 specification. See `openapi.yaml` for complete API documentation including:
+- Endpoint descriptions
+- Request/response schemas
+- Example requests and responses
+- Error response formats
+
+The API provides two main endpoints:
+- `GET /api/search?query={name}&langId={id}` - Search for Pokémon by name
+- `GET /api/lookup/{name}` - Get detailed Pokémon information
+
+## Development Scripts
+
+### Server Scripts
+- `npm run build` - Compile TypeScript to JavaScript
+- `npm start` - Build and run the server (production mode)
+- `npm run dev` - Run server in development mode with hot-reload
+- `npm run watch` - Watch TypeScript files and recompile on changes
+
+### Client Scripts
+- `npm start` - Start React development server
+- `npm run build` - Build for production
+- `npm run eject` - Eject from Create React App (one-way operation)
 
 ## Testing Objectives
 
@@ -108,3 +187,7 @@ The developers created a front-end application pointing to an established API as
 - Ensure there is sufficient test coverage of an appropriate level
 - Fix any flaky tests
 - Report any bugs you might come across
+
+## TypeScript
+
+Both the client and server are written in TypeScript for improved type safety and developer experience. Type definitions are shared where applicable, and the codebase follows strict TypeScript configuration for maximum type safety.

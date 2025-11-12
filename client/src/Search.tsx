@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSearch } from "./api/search";
 import { Sprite } from "./Sprite";
 
-export const Search = () => {
+export const Search: React.FC = () => {
   const [query, setQuery] = useState("");
   const { get, abort, data: search } = useSearch(query);
 
@@ -11,12 +11,13 @@ export const Search = () => {
     get();
     return () => abort();
   }, [abort, get, query]);
+
   return (
     <>
-      <div class="nes-container is-centred">
+      <div className="nes-container is-centred">
         <h1>Pokédex Search</h1>
         <div className="nes-field is-inline">
-          <label for="search_query">Search:</label>
+          <label htmlFor="search_query">Search:</label>
           <input
             id="search_query"
             type="text"
@@ -32,12 +33,12 @@ export const Search = () => {
         <>
           <br />
           <ul className="nes-container">
-            <p data-testid="invalid-term-error" class="note nes-text is-error">
+            <p data-testid="invalid-term-error" className="note nes-text is-error">
               Invalid search term
             </p>
           </ul>
         </>
-      ) : null }
+      ) : null}
       {query.match(/^[a-z]+$/) && search?.length ? (
         <>
           <br />
@@ -45,24 +46,25 @@ export const Search = () => {
             {search.map(({ id, name, localised }) => (
               <li data-test-id="result" key={id}>
                 <Link to={`/pokemon/${name}`}>
-                  <Sprite id={id} displayName={localised[0].name} size={96} />
-                  {localised[0].name}
+                  <Sprite id={id} displayName={localised[0]?.name} size={96} />
+                  {localised[0]?.name}
                 </Link>
               </li>
             ))}
           </ul>
         </>
-      ) : null }
+      ) : null}
       {query.match(/^[a-z]+$/) && search?.length === 0 ? (
         <>
           <br />
           <ul className="nes-container">
-            <p data-testid="no-results-message" class="note nes-text is-error">
+            <p data-testid="no-results-message" className="note nes-text is-error">
               No Pokémon found!
             </p>
           </ul>
         </>
-      ) : null }
+      ) : null}
     </>
   );
 };
+

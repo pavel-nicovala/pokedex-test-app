@@ -1,12 +1,14 @@
 import express, { Router } from "express";
-import { lookupPokemon, searchPokemon } from "./queries.mjs";
+import { lookupPokemon, searchPokemon } from "./queries.js";
 
-const api = new Router()
+const api = Router()
   .get("/search", searchPokemon)
   .get("/lookup/:name", lookupPokemon);
 
 const server = express()
   .use("/api", api)
   .listen(process.env.PORT || 3001, () => {
-    console.log("Backend server listening on", server.address());
+    const address = server.address();
+    console.log("Backend server listening on", address);
   });
+

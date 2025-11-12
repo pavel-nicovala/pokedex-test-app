@@ -1,6 +1,16 @@
-import { gqlRoute } from "./pokeapi.mjs";
+import { Request } from "express";
+import { gqlRoute } from "./pokeapi.js";
+import { SearchQueryParams, LookupParams, PokemonSpecies, PokemonDetails } from "./types.js";
 
-export const searchPokemon = gqlRoute({
+interface SearchData {
+  species: PokemonSpecies[];
+}
+
+interface LookupData {
+  pokemon: PokemonDetails[];
+}
+
+export const searchPokemon = gqlRoute<SearchQueryParams, SearchData, PokemonSpecies[]>({
   query: `query searchPokemon($query: String!, $langId: Int!) {
     species: pokemon_v2_pokemonspecies(where: {name: {_ilike: $query}}) {
       id
@@ -10,14 +20,14 @@ export const searchPokemon = gqlRoute({
       }
     }
   }`,
-  variables: (req) => ({
-    query: req.query.query + "%",
-    langId: req.query.langId ?? 9,
+  variables: (req: Request) => ({
+    query: (req.query.query as string) + "%",
+    langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
   }),
-  result: (data) => data.species,
+  result: (data: SearchData) => data.species,
 });
 
-export const lookupPokemon = gqlRoute({
+export const lookupPokemon = gqlRoute<LookupParams, LookupData, PokemonDetails>({
   query: `query lookupPokemon($name: String!) {
     pokemon: pokemon_v2_pokemon(where: {name: {_eq: $name}}) {
       height
@@ -63,6 +73,7 @@ export const lookupPokemon = gqlRoute({
       }
     }
   }`,
-  variables: (req) => req.params,
-  result: (data) => data.pokemon[0] ?? {},
+  variables: (req: Request) => ({ name: req.params.name } as LookupParams),
+  result: (data: LookupData) => data.pokemon[0] ?? ({} as PokemonDetails),
 });
+
