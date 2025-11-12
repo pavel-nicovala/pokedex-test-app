@@ -64,8 +64,8 @@ function EvolutionChain({ pokemon }: EvolutionChainProps): JSX.Element {
         pokemon.species.evolution_chain.evolutions.map((e) => (
           <div key={e.id}>
             <Link to={`/pokemon/${e.name}`}>
-              <Sprite id={e.id} displayName={e.localised[0]?.name} />{" "}
-              {e.localised[0]?.name}
+              <Sprite id={e.id} displayName={e.localised?.[0]?.name} />{" "}
+              {e.localised?.[0]?.name}
             </Link>
           </div>
         ))}

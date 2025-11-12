@@ -21,7 +21,7 @@ export interface PokemonItem {
 export interface PokemonEvolution {
   id: number;
   name: string;
-  localised: Array<{
+  localised?: Array<{
     name: string;
   }>;
 }
