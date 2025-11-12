@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Application
+    name: Build
     runs-on: ubuntu-latest
     
     steps:
@@ -44,7 +44,7 @@ jobs:
           retention-days: 1
 
   test-api:
-    name: Run API Tests
+    name: API Tests
     runs-on: ubuntu-latest
     needs: build
     
@@ -85,7 +85,7 @@ jobs:
         continue-on-error: true
 
   test-ui:
-    name: Start Application and Run Playwright Tests
+    name: UI Tests
     runs-on: ubuntu-latest
     needs: build
     
