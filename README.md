@@ -1,6 +1,6 @@
 # sdet-frontend-test
 
-A PokéDex application built with React and TypeScript, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress. The application consists of a TypeScript React frontend and a TypeScript Express backend API.
+A PokéDex application built with React and TypeScript, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress and Playwright. The application consists of a TypeScript React frontend and a TypeScript Express backend API.
 
 ## 📋 Table of Contents
 
@@ -30,6 +30,11 @@ A PokéDex application built with React and TypeScript, featuring a search inter
 2. Install dependencies:
    ```bash
    npm run pre-install
+   ```
+
+3. Install Playwright browsers (required for Playwright tests):
+   ```bash
+   npx playwright install
    ```
 
 ## Running the Application
@@ -74,9 +79,11 @@ The application uses npm workspaces to manage the client and server as separate 
 
 ## Running Tests
 
+### Cypress Tests
+
 Open Cypress Test Runner:
 ```bash
-npm run start:test
+npm run test:cypress:ui
 ```
 
 Or run Cypress tests headlessly:
@@ -84,7 +91,29 @@ Or run Cypress tests headlessly:
 npx cypress run
 ```
 
-**Note**: Make sure both the client and server are running before executing tests.
+### Playwright Tests
+
+Run Playwright tests:
+```bash
+npm run test:playwright
+```
+
+Run Playwright tests in UI mode (interactive):
+```bash
+npm run test:playwright:ui
+```
+
+Run Playwright tests in headed mode (visible browser):
+```bash
+npm run test:playwright:headed
+```
+
+Run Playwright tests in debug mode:
+```bash
+npm run test:playwright:debug
+```
+
+**Note**: Make sure both the client and server are running before executing tests. Playwright tests will automatically start the application if not already running.
 
 ## Project Structure
 
@@ -106,9 +135,20 @@ sdet-frontend-test/
 │   ├── dist/                  # Compiled JavaScript (generated)
 │   ├── tsconfig.json          # TypeScript configuration
 │   └── package.json
-├── cypress/                    # E2E tests
-│   └── e2e/                   # Test specifications
+├── cypress/                    # Cypress E2E tests
+│   └── e2e/                   # Cypress test specifications
+├── playwright/                 # Playwright E2E tests
+│   ├── e2e/
+│   │   ├── config/            # Environment configurations
+│   │   ├── specs/             # Playwright test specifications
+│   │   └── support/           # Test support files
+│   │       ├── fixtures/      # Test data and constants
+│   │       ├── page-objects/ # Page Object Model classes
+│   │       └── utils/          # Utility functions
+│   ├── tsconfig.json          # TypeScript configuration for Playwright
+│   └── README.md              # Playwright test documentation
 ├── cypress.config.js          # Cypress configuration
+├── playwright.config.ts       # Playwright configuration
 ├── openapi.yaml               # OpenAPI 3.0 specification
 └── package.json               # Root workspace configuration
 ```
@@ -151,7 +191,9 @@ After selecting a result, the user is taken to a details page with:
   - Node.js (ES Modules)
   - TypeScript 4.5.2
   - GraphQL client (PokeAPI)
-- **Testing**: Cypress 15.6.0
+- **Testing**: 
+  - Cypress 15.6.0
+  - Playwright 1.40.0
 - **API Documentation**: OpenAPI 3.0.3 (see `openapi.yaml`)
 
 ## API Documentation
@@ -168,6 +210,10 @@ The API provides two main endpoints:
 
 ## Development Scripts
 
+### Root Scripts
+- `npm start` - Start both client and server simultaneously
+- `npm run pre-install` - Install dependencies (ignoring engine requirements)
+
 ### Server Scripts
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm start` - Build and run the server (production mode)
@@ -178,6 +224,13 @@ The API provides two main endpoints:
 - `npm start` - Start React development server
 - `npm run build` - Build for production
 - `npm run eject` - Eject from Create React App (one-way operation)
+
+### Test Scripts
+- `npm run test:cypress:ui` - Open Cypress Test Runner
+- `npm run test:playwright` - Run Playwright tests
+- `npm run test:playwright:ui` - Run Playwright tests in UI mode (interactive)
+- `npm run test:playwright:headed` - Run Playwright tests with visible browser
+- `npm run test:playwright:debug` - Run Playwright tests in debug mode
 
 ## Testing Objectives
 

@@ -11,7 +11,7 @@
     "start": "run-p start:*",
     "start:client": "npm -w ../pokedex-test-app/client start",
     "start:server": "npm -w ../pokedex-test-app/server start",
-    "start:test": "cypress open",
+    "test:cypress:ui": "cypress open",
     "test:playwright": "playwright test",
     "test:playwright:ui": "playwright test --ui",
     "test:playwright:headed": "playwright test --headed",
