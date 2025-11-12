@@ -1,6 +1,6 @@
 # sdet-frontend-test
 
-A PokéDex application built with React and TypeScript, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress and Playwright. The application consists of a TypeScript React frontend and a TypeScript Express backend API.
+A PokéDex application built with React and TypeScript, featuring a search interface for Pokémon data with comprehensive test coverage using Cypress, Playwright, and Supertest. The application consists of a TypeScript React frontend and a TypeScript Express backend API.
 
 ## 📋 Table of Contents
 
@@ -115,6 +115,22 @@ npm run test:playwright:debug
 
 **Note**: Make sure both the client and server are running before executing tests. Playwright tests will automatically start the application if not already running.
 
+### API Tests
+
+Run API tests (using Supertest):
+```bash
+cd server
+npm test
+```
+
+Run API tests in watch mode:
+```bash
+cd server
+npm run test:watch
+```
+
+**Note**: API tests use Supertest to test the Express API directly without requiring the server to be running. Tests are located in `server/src/__tests__/api/` and cover all endpoints defined in the OpenAPI specification.
+
 ## Project Structure
 
 ```
@@ -131,8 +147,14 @@ sdet-frontend-test/
 │   │   ├── index.ts           # Server entry point
 │   │   ├── pokeapi.ts         # GraphQL client wrapper
 │   │   ├── queries.ts         # API route handlers
-│   │   └── types.ts           # TypeScript type definitions
+│   │   ├── types.ts           # TypeScript type definitions
+│   │   └── __tests__/         # API tests
+│   │       ├── api/           # API endpoint tests
+│   │       ├── config/        # Test environment configurations
+│   │       ├── helpers/       # Test utilities
+│   │       └── README.md      # API tests documentation
 │   ├── dist/                  # Compiled JavaScript (generated)
+│   ├── vitest.config.ts       # Vitest test configuration
 │   ├── tsconfig.json          # TypeScript configuration
 │   └── package.json
 ├── cypress/                    # Cypress E2E tests
@@ -192,8 +214,10 @@ After selecting a result, the user is taken to a details page with:
   - TypeScript 4.5.2
   - GraphQL client (PokeAPI)
 - **Testing**: 
-  - Cypress 15.6.0
-  - Playwright 1.40.0
+  - Cypress 15.6.0 (E2E tests)
+  - Playwright 1.40.0 (E2E tests)
+  - Supertest 6.3.3 (API tests)
+  - Vitest 1.0.4 (Test runner for API tests)
 - **API Documentation**: OpenAPI 3.0.3 (see `openapi.yaml`)
 
 ## API Documentation
@@ -219,6 +243,9 @@ The API provides two main endpoints:
 - `npm start` - Build and run the server (production mode)
 - `npm run dev` - Run server in development mode with hot-reload
 - `npm run watch` - Watch TypeScript files and recompile on changes
+- `npm test` - Run API tests
+- `npm run test:api` - Run API tests (alias)
+- `npm run test:watch` - Run API tests in watch mode
 
 ### Client Scripts
 - `npm start` - Start React development server
@@ -231,6 +258,8 @@ The API provides two main endpoints:
 - `npm run test:playwright:ui` - Run Playwright tests in UI mode (interactive)
 - `npm run test:playwright:headed` - Run Playwright tests with visible browser
 - `npm run test:playwright:debug` - Run Playwright tests in debug mode
+- `cd server && npm test` - Run API tests (Supertest)
+- `cd server && npm run test:watch` - Run API tests in watch mode
 
 ## Testing Objectives
 
@@ -240,6 +269,27 @@ The developers created a front-end application pointing to an established API as
 - Ensure there is sufficient test coverage of an appropriate level
 - Fix any flaky tests
 - Report any bugs you might come across
+
+### Test Coverage
+
+The project includes comprehensive test coverage at multiple levels:
+
+1. **API Tests** (Supertest + Vitest): Unit and integration tests for all API endpoints
+   - Tests for `GET /api/search` endpoint
+   - Tests for `GET /api/lookup/{name}` endpoint
+   - Response structure validation
+   - Error handling validation
+   - Located in `server/src/__tests__/api/`
+
+2. **E2E Tests** (Playwright): End-to-end tests for the full application
+   - Page load validation
+   - Search functionality
+   - Pokemon details display
+   - Error handling
+   - Located in `playwright/e2e/specs/`
+
+3. **E2E Tests** (Cypress): Legacy E2E tests
+   - Located in `cypress/e2e/`
 
 ## TypeScript
 
