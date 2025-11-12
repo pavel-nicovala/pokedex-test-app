@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/index.mjs",
+  "scripts": {
+    "start": "nodemon src/index.mjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-fetch": "^3.1.0",
+    "pokedex-promise-v2": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.2",
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.11.11",
+    "nodemon": "^3.0.0",
+    "typescript": "^4.5.2"
+  }
+}
