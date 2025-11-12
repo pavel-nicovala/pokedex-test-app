@@ -1,0 +1,365 @@
+openapi: 3.0.3
+info:
+  title: PokéDex API
+  description: |
+    A RESTful API for searching and retrieving Pokémon information from the PokéAPI GraphQL endpoint.
+    This API provides endpoints for searching Pokémon by name and retrieving detailed information about specific Pokémon.
+  version: 1.0.0
+  contact:
+    name: PokéDex API Support
+
+servers:
+  - url: http://localhost:3001
+    description: Local development server
+  - url: http://localhost:3001/api
+    description: API base path
+
+paths:
+  /api/search:
+    get:
+      summary: Search for Pokémon by name
+      description: |
+        Searches for Pokémon species whose names match the provided query string.
+        The search is case-insensitive and uses pattern matching (LIKE query).
+        Returns a list of matching Pokémon species with their IDs, names, and localized names.
+      operationId: searchPokemon
+      tags:
+        - Pokémon
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: |
+            The search query string. The API will append a '%' wildcard for pattern matching.
+            Only alphabetical characters should be used for valid searches.
+          schema:
+            type: string
+            example: "pikachu"
+        - name: langId
+          in: query
+          required: false
+          description: |
+            Language ID for localized names. Defaults to 9 (English).
+          schema:
+            type: integer
+            default: 9
+            example: 9
+      responses:
+        '200':
+          description: Successful search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PokemonSpecies'
+              examples:
+                success:
+                  summary: Successful search results
+                  value:
+                    - id: 25
+                      name: pikachu
+                      localised:
+                        - name: Pikachu
+                    - id: 26
+                      name: raichu
+                      localised:
+                        - name: Raichu
+        '400':
+          description: Bad request - Invalid query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  message: "Invalid query parameter"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  message: "Internal server error"
+
+  /api/lookup/{name}:
+    get:
+      summary: Get detailed Pokémon information
+      description: |
+        Retrieves comprehensive information about a specific Pokémon by its name.
+        Returns detailed data including physical attributes, species information, types, held items,
+        evolution chain, and flavor text.
+      operationId: lookupPokemon
+      tags:
+        - Pokémon
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: The exact name of the Pokémon (case-sensitive)
+          schema:
+            type: string
+            example: "pikachu"
+      responses:
+        '200':
+          description: Successful lookup - Returns detailed Pokémon information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonDetails'
+              examples:
+                pikachu:
+                  summary: Pikachu details
+                  value:
+                    height: 4
+                    weight: 60
+                    species:
+                      id: 25
+                      name: pikachu
+                      is_baby: false
+                      is_legendary: false
+                      is_mythical: false
+                      base_happiness: 70
+                      capture_rate: 190
+                      gender_rate: 4
+                      has_gender_differences: true
+                      forms_switchable: false
+                      localised:
+                        - name: Pikachu
+                      evolution_chain:
+                        evolutions:
+                          - id: 172
+                            name: pichu
+                            localised:
+                              - name: Pichu
+                          - id: 25
+                            name: pikachu
+                            localised:
+                              - name: Pikachu
+                          - id: 26
+                            name: raichu
+                            localised:
+                              - name: Raichu
+                      flavor_text:
+                        - id: 1
+                          flavor_text: "When several of these Pokémon gather, their electricity could build and cause lightning storms."
+                    types:
+                      - names:
+                          name: electric
+                    items: []
+        '400':
+          description: Bad request - Invalid Pokémon name parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  message: "Invalid Pokémon name"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  message: "Internal server error"
+        '404':
+          description: Pokémon not found (when empty object is returned)
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+
+components:
+  schemas:
+    PokemonSpecies:
+      type: object
+      description: Basic Pokémon species information from search results
+      properties:
+        id:
+          type: integer
+          description: The Pokédex number of the Pokémon species
+          example: 25
+        name:
+          type: string
+          description: The internal name of the Pokémon species
+          example: "pikachu"
+        localised:
+          type: array
+          description: Localized names for the Pokémon species
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The localized name
+                example: "Pikachu"
+      required:
+        - id
+        - name
+        - localised
+
+    PokemonDetails:
+      type: object
+      description: Comprehensive Pokémon information including physical attributes, species data, types, items, and evolution chain
+      properties:
+        height:
+          type: integer
+          description: Height of the Pokémon in decimeters
+          example: 4
+        weight:
+          type: integer
+          description: Weight of the Pokémon in hectograms
+          example: 60
+        species:
+          $ref: '#/components/schemas/PokemonSpeciesDetails'
+        types:
+          type: array
+          description: List of types this Pokémon has
+          items:
+            type: object
+            properties:
+              names:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The type name
+                    example: "electric"
+        items:
+          type: array
+          description: Items that this Pokémon can hold (may be empty)
+          items:
+            type: object
+            properties:
+              item:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The item name
+                    example: "light-ball"
+      required:
+        - height
+        - weight
+        - species
+        - types
+        - items
+
+    PokemonSpeciesDetails:
+      type: object
+      description: Detailed species information
+      properties:
+        id:
+          type: integer
+          description: The Pokédex number
+          example: 25
+        name:
+          type: string
+          description: The internal species name
+          example: "pikachu"
+        is_baby:
+          type: boolean
+          description: Whether this is a baby Pokémon
+          example: false
+        is_legendary:
+          type: boolean
+          description: Whether this is a legendary Pokémon
+          example: false
+        is_mythical:
+          type: boolean
+          description: Whether this is a mythical Pokémon
+          example: false
+        base_happiness:
+          type: integer
+          description: Base happiness value
+          example: 70
+        capture_rate:
+          type: integer
+          description: Capture rate (lower is harder to catch)
+          example: 190
+        gender_rate:
+          type: integer
+          description: Gender rate (determines gender distribution)
+          example: 4
+        has_gender_differences:
+          type: boolean
+          description: Whether this Pokémon has visual gender differences
+          example: true
+        forms_switchable:
+          type: boolean
+          description: Whether this Pokémon can switch between forms
+          example: false
+        localised:
+          type: array
+          description: Localized names
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Pikachu"
+        evolution_chain:
+          type: object
+          description: Evolution chain information
+          properties:
+            evolutions:
+              type: array
+              description: List of all Pokémon in this evolution chain
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 25
+                  name:
+                    type: string
+                    example: "pikachu"
+                  localised:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "Pikachu"
+        flavor_text:
+          type: array
+          description: Flavor text descriptions
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              flavor_text:
+                type: string
+                description: The flavor text description
+                example: "When several of these Pokémon gather, their electricity could build and cause lightning storms."
+      required:
+        - id
+        - name
+
+    Error:
+      type: object
+      description: Error response structure
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message describing what went wrong
+              example: "Invalid query parameter"
+      required:
+        - error
+
+tags:
+  - name: Pokémon
+    description: Operations related to Pokémon search and lookup
+
