@@ -243,9 +243,6 @@ The API provides two main endpoints:
 - `npm start` - Build and run the server (production mode)
 - `npm run dev` - Run server in development mode with hot-reload
 - `npm run watch` - Watch TypeScript files and recompile on changes
-- `npm test` - Run API tests
-- `npm run test:api` - Run API tests (alias)
-- `npm run test:watch` - Run API tests in watch mode
 
 ### Client Scripts
 - `npm start` - Start React development server
