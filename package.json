@@ -8,6 +8,12 @@
   ],
   "scripts": {
     "pre-install": "npm install --ignore-engines",
+    "build": "run-p build:*",
+    "build:client": "npm -w client run build",
+    "build:server": "npm -w server run build",
+    "serve": "npm run build && run-p serve:*",
+    "serve:client": "npx serve -s client/build -l 3000",
+    "serve:server": "npm -w server start",
     "start": "run-p start:*",
     "start:client": "npm -w client start",
     "start:server": "npm -w server run build && npm -w server start",
@@ -24,6 +30,7 @@
     "cypress": "^15.6.0",
     "nodemon": "^3.0.0",
     "npm-run-all": "^4.1.5",
+    "serve": "^14.2.1",
     "typescript": "^5.3.0"
   },
   "overrides": {
