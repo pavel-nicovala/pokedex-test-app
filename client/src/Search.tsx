@@ -5,12 +5,17 @@ import { Sprite } from "./Sprite";
 
 export const Search: React.FC = () => {
   const [query, setQuery] = useState("");
-  const { get, abort, data: search } = useSearch(query);
+  const { get, abort, data: search, error } = useSearch(query);
 
   useEffect(() => {
-    get();
+    if (query) {
+      get();
+    }
     return () => abort();
   }, [abort, get, query]);
+  
+  // Ensure search is always an array
+  const searchResults = Array.isArray(search) ? search : [];
 
   return (
     <>
@@ -39,11 +44,11 @@ export const Search: React.FC = () => {
           </ul>
         </>
       ) : null}
-      {query.match(/^[a-z]+$/) && search?.length ? (
+      {query.match(/^[a-z]+$/) && searchResults.length > 0 ? (
         <>
           <br />
           <ul className="nes-container">
-            {search.map(({ id, name, localised }) => (
+            {searchResults.map(({ id, name, localised }) => (
               <li data-test-id="result" key={id}>
                 <Link to={`/pokemon/${name}`}>
                   <Sprite id={id} displayName={localised[0]?.name} size={96} />
@@ -54,7 +59,7 @@ export const Search: React.FC = () => {
           </ul>
         </>
       ) : null}
-      {query.match(/^[a-z]+$/) && search?.length === 0 ? (
+      {query.match(/^[a-z]+$/) && searchResults.length === 0 && !error ? (
         <>
           <br />
           <ul className="nes-container">
