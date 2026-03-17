@@ -28,7 +28,7 @@ jobs:
         run: |
           curl -fsSL https://cursor.com/install | bash
           export PATH="$HOME/.cursor/bin:$PATH"
-          agent -p --output-format text "
+          agent -p --trust --output-format text "
           Use the project instructions in AGENTS.md and the rules in .cursor/rules/ as your guide.
 
           Review the PR diff for this repo:
