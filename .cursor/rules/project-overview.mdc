@@ -1,0 +1,12 @@
+---
+description: Monorepo layout, scripts, and where to change things in the PokéDex app
+alwaysApply: true
+---
+
+# Project overview
+
+- **Root**: npm workspaces; `client` and `server` are separate packages. Use root scripts: `npm start`, `npm run build`, `npm run test:playwright`.
+- **Client** (`client/`): React (CRA), port 3000. Build output: `client/build`. API base URL: `client/src/api/config.ts` (`REACT_APP_API_URL`).
+- **Server** (`server/`): Express under `/api`, port 3001. Entry: `server/src/index.ts`; handlers in `server/src/queries.ts`. Build: `server/dist/`.
+- **API contract**: `openapi.yaml`. Keep server implementation and client API usage in sync with it.
+- **Tests**: API in `server/src/__tests__/api/`; E2E in `playwright/` and `cypress/`. Use `npm install --legacy-peer-deps` if install fails.
