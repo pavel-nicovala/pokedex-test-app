@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { Router, Express } from "express";
 import { lookupPokemon, searchPokemon } from "./queries.js";
 
@@ -5,7 +6,9 @@ const api = Router()
   .get("/search", searchPokemon)
   .get("/lookup/:name", lookupPokemon);
 
-export const app: Express = express().use("/api", api);
+export const app: Express = express()
+  .use(cors({ origin: process.env.CORS_ORIGIN || true })) // allow frontend on another domain (e.g. GitHub Pages)
+  .use("/api", api);
 
 // Only start the server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
