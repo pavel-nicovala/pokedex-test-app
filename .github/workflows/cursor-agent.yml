@@ -2,11 +2,15 @@
 # Requires CURSOR_API_KEY in repo secrets. Skip this workflow if you don't use Cursor API.
 # See docs: https://cursor.com/docs/cli/github-actions
 
-name: Cursor Agent (optional)
+name: Cursor Agent
 
 on:
-  pull_request:
-    branches: [main, master, develop]
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Base branch to diff against (e.g. main)"
+        required: false
+        default: "main"
 
 jobs:
   cursor-review:
@@ -22,22 +26,43 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Cursor CLI and run agent
+      - name: Generate PR diff
+        run: |
+          BASE_REF="${{ github.event.inputs.base_ref }}"
+          git fetch origin "$BASE_REF"
+          git diff "origin/$BASE_REF"...HEAD -- \
+            ':(exclude)package-lock.json' \
+            ':(exclude)*.lock' \
+            > pr-diff.txt
+          echo "Diff size: $(wc -l < pr-diff.txt) lines"
+
+      - name: Install Cursor CLI
+        run: |
+          curl -fsSL https://cursor.com/install | bash
+          echo "$HOME/.cursor/bin" >> $GITHUB_PATH
+
+      - name: Run Cursor Agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
-          curl -fsSL https://cursor.com/install | bash
-          export PATH="$HOME/.cursor/bin:$PATH"
-          agent -p --trust --output-format text "
-          Use the project instructions in AGENTS.md and the rules in .cursor/rules/ as your guide.
+          echo "::notice::Running Cursor Agent (may take 1-3 minutes)..."
+          DIFF=$(cat pr-diff.txt)
+          PROMPT="You are reviewing a pull request for a React + Express PokéDex monorepo.
 
-          Review the PR diff for this repo:
-          - Do the changes follow the workflows in AGENTS.md (e.g. API changes touch server, openapi.yaml, and client)?
-          - Are client/server types and API usage consistent?
-          - Any obvious issues or missing tests?
+Project conventions are in AGENTS.md and .cursor/rules/.
 
-          Write a short review (what looks good, what to double-check). Do NOT modify any files; only output your review to stdout.
-          " 2>&1 | tee cursor-review.txt || true
+Here is the full diff of this PR:
+<diff>
+$DIFF
+</diff>
+
+Review this diff:
+- Do API changes update server, openapi.yaml, AND client together?
+- Are TypeScript types consistent between client and server?
+- Are there obvious bugs or missing test coverage?
+
+Write a concise review (bullet points for issues, a short summary of what looks good). Do NOT modify any files."
+          timeout 480 "$HOME/.cursor/bin/agent" -p --trust --output-format text "$PROMPT" 2>&1 | tee cursor-review.txt || true
         continue-on-error: true
 
       - name: Ensure review file exists
