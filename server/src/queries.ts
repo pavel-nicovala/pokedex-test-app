@@ -20,10 +20,16 @@ export const searchPokemon = gqlRoute<SearchQueryParams, SearchData, PokemonSpec
       }
     }
   }`,
-  variables: (req: Request) => ({
-    query: (req.query.query as string) + "%",
-    langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
-  }),
+  variables: (req: Request) => {
+    const query = req.query.query as string | undefined;
+    if (!query || query.trim() === "") {
+      throw new Error("Invalid query parameter");
+    }
+    return {
+      query: query + "%",
+      langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
+    };
+  },
   result: (data: SearchData) => data.species,
 });
 
