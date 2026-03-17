@@ -41,28 +41,28 @@ jobs:
           curl -fsSL https://cursor.com/install | bash
           echo "$HOME/.cursor/bin" >> $GITHUB_PATH
 
+      - name: Build prompt file
+        run: |
+          cat > prompt.txt << 'PROMPT_EOF'
+          You are reviewing a pull request for a React + Express PokeDex monorepo.
+          Project conventions are in AGENTS.md and .cursor/rules/.
+          Here is the full diff of this PR:
+          PROMPT_EOF
+          cat pr-diff.txt >> prompt.txt
+          cat >> prompt.txt << 'PROMPT_EOF'
+          Review this diff:
+          - Do API changes update server, openapi.yaml, AND client together?
+          - Are TypeScript types consistent between client and server?
+          - Are there obvious bugs or missing test coverage?
+          Write a concise review (bullet points for issues, a short summary of what looks good). Do NOT modify any files.
+          PROMPT_EOF
+
       - name: Run Cursor Agent
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
           echo "::notice::Running Cursor Agent (may take 1-3 minutes)..."
-          DIFF=$(cat pr-diff.txt)
-          PROMPT="You are reviewing a pull request for a React + Express PokéDex monorepo.
-
-Project conventions are in AGENTS.md and .cursor/rules/.
-
-Here is the full diff of this PR:
-<diff>
-$DIFF
-</diff>
-
-Review this diff:
-- Do API changes update server, openapi.yaml, AND client together?
-- Are TypeScript types consistent between client and server?
-- Are there obvious bugs or missing test coverage?
-
-Write a concise review (bullet points for issues, a short summary of what looks good). Do NOT modify any files."
-          timeout 480 "$HOME/.cursor/bin/agent" -p --trust --output-format text "$PROMPT" 2>&1 | tee cursor-review.txt || true
+          timeout 480 "$HOME/.cursor/bin/agent" -p --trust --output-format text "$(cat prompt.txt)" 2>&1 | tee cursor-review.txt || true
         continue-on-error: true
 
       - name: Ensure review file exists
