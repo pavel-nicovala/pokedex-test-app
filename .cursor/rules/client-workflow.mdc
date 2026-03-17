@@ -1,0 +1,12 @@
+---
+description: React client patterns, API hooks, and env config for the PokéDex frontend
+globs: client/**/*
+alwaysApply: false
+---
+
+# Client (React) workflow
+
+- **API calls**: Use hooks in `client/src/api/` (e.g. `useSearch`, `useDetails`). Base URL from `client/src/api/config.ts` (`API_BASE` / `REACT_APP_API_URL`). Never hardcode API host in components.
+- **Types**: Shared API types in `client/src/types.ts`. Keep in sync with server responses and `openapi.yaml`.
+- **Routing**: React Router in `client/src/index.tsx`; routes `/` and `/pokemon/:name`. For GitHub Pages deployment, set `homepage` in `client/package.json` and build with `REACT_APP_API_URL` set.
+- **New endpoints**: Add a hook in `client/src/api/` that uses `useFetch` from `use-http` with `${API_BASE}/api/...` and wire components to it.

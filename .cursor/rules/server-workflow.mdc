@@ -1,0 +1,13 @@
+---
+description: Express server patterns, CORS, and API structure for the PokéDex backend
+globs: server/**/*
+alwaysApply: false
+---
+
+# Server (Express) workflow
+
+- **Routes**: Mounted under `/api` in `server/src/index.ts`. Handlers live in `server/src/queries.ts`. Add new routes on the same router and export from `queries.ts`.
+- **CORS**: Already enabled via `cors`; origin from `CORS_ORIGIN` or allow-all. Add `@types/cors` if TypeScript complains.
+- **Types**: Use TypeScript types for request/response; keep aligned with `openapi.yaml` and client types.
+- **Tests**: API tests in `server/src/__tests__/api/` with Supertest. Run with `cd server && npm test`. After changing routes or handlers, run these tests.
+- **Build**: `npm run build` compiles to `server/dist/`. Use `PORT` in production.
