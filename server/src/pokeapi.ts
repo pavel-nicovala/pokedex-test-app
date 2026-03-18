@@ -8,7 +8,7 @@ const gqlRequest = async <T = any>(
 ): Promise<T> => {
   const response = await fetch(`https://beta.pokeapi.co/graphql/v1beta`, {
     method: "post",
-    headers: { "content-type": "application/graphql" },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify({ query, variables }),
   });
 
