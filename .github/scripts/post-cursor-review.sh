@@ -19,6 +19,6 @@ fi
 while IFS= read -r cid; do
   [ -z "$cid" ] && continue
   gh api -X DELETE "repos/${REPO}/issues/comments/${cid}" || true
-done < <(gh pr view "$PR_NUM" --json comments -q '.comments[] | select(.body | startswith("## Cursor Agent Review")) | .databaseId' || true)
+done < <(gh pr view "$PR_NUM" --json comments -q '.comments[] | select(.body | (startswith("## Cursor Agent Review") or startswith("## 🤖 Cursor Agent Review"))) | .databaseId' || true)
 
 gh pr comment "$PR_NUM" --body-file pr-comment-body.txt

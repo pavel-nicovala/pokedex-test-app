@@ -27,7 +27,9 @@ const searchPokemonFetch = gqlFetch<SearchQueryParams, SearchData, PokemonSpecie
     if (isNaN(langId)) {
       throw new Error("Invalid langId parameter: must be a number");
     }
-    return { query: (req.query.query as string) + "%", langId };
+    const query = req.query.query as string | undefined;
+    if (!query) throw new Error("Invalid query parameter");
+    return { query: query + "%", langId };
   },
   result: (data: SearchData) => data.species,
 });

@@ -40,6 +40,8 @@ paths:
           required: false
           description: |
             Language ID for localized names. Defaults to 9 (English).
+            Must be a valid integer; non-numeric values return 400.
+            Note: custom entries (id >= 10001) always return English names regardless of this value.
           schema:
             type: integer
             default: 9
@@ -73,14 +75,22 @@ paths:
                       localised:
                         - name: Mylahore
         '400':
-          description: Bad request - Invalid query parameter
+          description: Bad request - Invalid query or langId parameter
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                error:
-                  message: "Invalid query parameter"
+              examples:
+                invalidQuery:
+                  summary: Missing or empty query
+                  value:
+                    error:
+                      message: "Invalid query parameter"
+                invalidLangId:
+                  summary: Non-numeric langId
+                  value:
+                    error:
+                      message: "Invalid langId parameter: must be a number"
         '500':
           description: Internal server error
           content:
