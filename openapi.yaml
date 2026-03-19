@@ -11,8 +11,6 @@ info:
 servers:
   - url: http://localhost:3001
     description: Local development server
-  - url: http://localhost:3001/api
-    description: API base path
 
 paths:
   /api/search:
@@ -104,7 +102,7 @@ paths:
             example: "pikachu"
       responses:
         '200':
-          description: Successful lookup - Returns detailed Pokémon information
+          description: Successful lookup - Returns detailed Pokémon information, or an empty object `{}` when the Pokémon is not found
           content:
             application/json:
               schema:
@@ -167,14 +165,6 @@ paths:
               example:
                 error:
                   message: "Internal server error"
-        '404':
-          description: Pokémon not found (when empty object is returned)
-          content:
-            application/json:
-              schema:
-                type: object
-                example: {}
-
 components:
   schemas:
     PokemonSpecies:
@@ -344,6 +334,15 @@ components:
       required:
         - id
         - name
+        - is_baby
+        - is_legendary
+        - is_mythical
+        - base_happiness
+        - capture_rate
+        - gender_rate
+        - has_gender_differences
+        - forms_switchable
+        - localised
 
     Error:
       type: object

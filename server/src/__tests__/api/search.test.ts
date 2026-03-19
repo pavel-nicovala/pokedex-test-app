@@ -74,7 +74,7 @@ describe('GET /api/search', () => {
   });
 
   describe('Error handling', () => {
-    it.skip('should return 400 for missing query parameter', async () => {
+    it('should return 400 for missing query parameter', async () => {
       const response = await request(app)
         .get('/api/search')
         .expect(400);
@@ -83,7 +83,7 @@ describe('GET /api/search', () => {
       expect(response.body.error).toHaveProperty('message');
     });
 
-    it.skip('should return 400 for empty query parameter', async () => {
+    it('should return 400 for empty query parameter', async () => {
       const response = await request(app)
         .get('/api/search')
         .query({ query: '' })
