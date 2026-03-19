@@ -43,7 +43,7 @@ export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: 
 };
 
 export function matchCustomPokemonSearch(query: string): PokemonSpecies[] {
-  const q = query.toLowerCase().replace(/%$/, "");
+  const q = query.toLowerCase();
   return Object.values(CUSTOM_POKEMON)
     .filter(({ species }) => species.name.startsWith(q))
     .map(({ species }) => species);

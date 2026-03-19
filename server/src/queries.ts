@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { gqlRoute } from "./pokeapi.js";
+import { gqlFetch, gqlRoute, BadRequestError } from "./pokeapi.js";
 import { SearchQueryParams, LookupParams, PokemonSpecies, PokemonDetails } from "./types.js";
 import { matchCustomPokemonSearch, lookupCustomPokemon } from "./custom-pokemon.js";
 
@@ -11,7 +11,7 @@ interface LookupData {
   pokemon: PokemonDetails[];
 }
 
-const searchPokemonBase = gqlRoute<SearchQueryParams, SearchData, PokemonSpecies[]>({
+const searchPokemonFetch = gqlFetch<SearchQueryParams, SearchData, PokemonSpecies[]>({
   query: `query searchPokemon($query: String!, $langId: Int!) {
     species: pokemon_v2_pokemonspecies(where: {name: {_ilike: $query}}) {
       id
@@ -21,16 +21,10 @@ const searchPokemonBase = gqlRoute<SearchQueryParams, SearchData, PokemonSpecies
       }
     }
   }`,
-  variables: (req: Request) => {
-    const query = req.query.query as string | undefined;
-    if (!query || query.trim() === "") {
-      throw new Error("Invalid query parameter");
-    }
-    return {
-      query: query + "%",
-      langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
-    };
-  },
+  variables: (req: Request) => ({
+    query: (req.query.query as string) + "%",
+    langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
+  }),
   result: (data: SearchData) => data.species,
 });
 
@@ -40,23 +34,18 @@ export const searchPokemon = async (req: Request, res: Response): Promise<void> 
     res.status(400).json({ error: { message: "Invalid query parameter" } });
     return;
   }
-  const custom = matchCustomPokemonSearch(query);
-
-  // Capture the base handler's response to merge in custom results
-  let baseStatus = 200;
-  let baseBody: PokemonSpecies[] = [];
-  const fakeRes = {
-    status(code: number) { baseStatus = code; return fakeRes; },
-    json(body: unknown) { baseBody = body as PokemonSpecies[]; return fakeRes; },
-  } as unknown as Response;
-
-  await searchPokemonBase(req, fakeRes);
-
-  if (baseStatus !== 200) {
-    res.status(baseStatus).json(baseBody);
-    return;
+  try {
+    const baseResults = await searchPokemonFetch(req);
+    const custom = matchCustomPokemonSearch(query);
+    res.status(200).json([...baseResults, ...custom]);
+  } catch (error) {
+    const err = error as Error;
+    if (err instanceof BadRequestError) {
+      res.status(400).json({ error: { message: err.message } });
+    } else {
+      res.status(500).json({ error: { message: err.message } });
+    }
   }
-  res.status(200).json([...baseBody, ...custom]);
 };
 
 const lookupPokemonBase = gqlRoute<LookupParams, LookupData, PokemonDetails>({
@@ -117,4 +106,3 @@ export const lookupPokemon = async (req: Request, res: Response): Promise<void> 
   }
   await lookupPokemonBase(req, res);
 };
-

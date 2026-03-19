@@ -20,6 +20,8 @@ paths:
         Searches for Pokémon species whose names match the provided query string.
         The search is case-insensitive and uses pattern matching (LIKE query).
         Returns a list of matching Pokémon species with their IDs, names, and localized names.
+        Results may include custom Pokémon entries not sourced from PokéAPI (e.g. entries with IDs ≥ 10001).
+        Custom entries appear after standard PokéAPI results in the response array.
       operationId: searchPokemon
       tags:
         - Pokémon
@@ -53,7 +55,7 @@ paths:
                   $ref: '#/components/schemas/PokemonSpecies'
               examples:
                 success:
-                  summary: Successful search results
+                  summary: Successful search results (standard Pokémon)
                   value:
                     - id: 25
                       name: pikachu
@@ -63,6 +65,13 @@ paths:
                       name: raichu
                       localised:
                         - name: Raichu
+                custom:
+                  summary: Search result including a custom Pokémon entry
+                  value:
+                    - id: 10001
+                      name: mylahore
+                      localised:
+                        - name: Mylahore
         '400':
           description: Bad request - Invalid query parameter
           content:
@@ -89,6 +98,7 @@ paths:
         Retrieves comprehensive information about a specific Pokémon by its name.
         Returns detailed data including physical attributes, species information, types, held items,
         evolution chain, and flavor text.
+        Custom Pokémon entries (not from PokéAPI) are resolved first before querying PokéAPI.
       operationId: lookupPokemon
       tags:
         - Pokémon
