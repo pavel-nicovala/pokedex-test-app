@@ -20,6 +20,8 @@ paths:
         Searches for Pokémon species whose names match the provided query string.
         The search is case-insensitive and uses pattern matching (LIKE query).
         Returns a list of matching Pokémon species with their IDs, names, and localized names.
+        Results may include custom Pokémon entries not sourced from PokéAPI (e.g. entries with IDs ≥ 10001).
+        Custom entries appear after standard PokéAPI results in the response array.
       operationId: searchPokemon
       tags:
         - Pokémon
@@ -38,6 +40,8 @@ paths:
           required: false
           description: |
             Language ID for localized names. Defaults to 9 (English).
+            Must be a valid integer; non-numeric values return 400.
+            Note: custom entries (id >= 10001) always return English names regardless of this value.
           schema:
             type: integer
             default: 9
@@ -53,7 +57,7 @@ paths:
                   $ref: '#/components/schemas/PokemonSpecies'
               examples:
                 success:
-                  summary: Successful search results
+                  summary: Successful search results (standard Pokémon)
                   value:
                     - id: 25
                       name: pikachu
@@ -63,15 +67,30 @@ paths:
                       name: raichu
                       localised:
                         - name: Raichu
+                custom:
+                  summary: Search result including a custom Pokémon entry
+                  value:
+                    - id: 10001
+                      name: mylahore
+                      localised:
+                        - name: Mylahore
         '400':
-          description: Bad request - Invalid query parameter
+          description: Bad request - Invalid query or langId parameter
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                error:
-                  message: "Invalid query parameter"
+              examples:
+                invalidQuery:
+                  summary: Missing or empty query
+                  value:
+                    error:
+                      message: "Invalid query parameter"
+                invalidLangId:
+                  summary: Non-numeric langId
+                  value:
+                    error:
+                      message: "Invalid langId parameter: must be a number"
         '500':
           description: Internal server error
           content:
@@ -89,6 +108,7 @@ paths:
         Retrieves comprehensive information about a specific Pokémon by its name.
         Returns detailed data including physical attributes, species information, types, held items,
         evolution chain, and flavor text.
+        Custom Pokémon entries (not from PokéAPI) are resolved first before querying PokéAPI.
       operationId: lookupPokemon
       tags:
         - Pokémon
@@ -96,7 +116,9 @@ paths:
         - name: name
           in: path
           required: true
-          description: The exact name of the Pokémon (case-sensitive)
+          description: |
+            The Pokémon name to look up. Custom entries (id >= 10001) are matched
+            case-insensitively; standard PokéAPI entries require an exact lowercase match.
           schema:
             type: string
             example: "pikachu"
