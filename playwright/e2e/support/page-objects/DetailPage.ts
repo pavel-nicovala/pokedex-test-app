@@ -22,7 +22,7 @@ export class DetailPage {
     height: string;
     weight: string;
     types: string;
-    heldItems: string;
+    heldItems?: string;
   }): Promise<void> {
     // Verify PokéDex Number
     await expect(
@@ -44,10 +44,12 @@ export class DetailPage {
       this.page.getByRole('row', { name: new RegExp(`Types.*${details.types}`) })
     ).toBeVisible();
 
-    // Verify Held Items
-    await expect(
-      this.page.getByRole('row', { name: new RegExp(`Held Items.*${details.heldItems}`) })
-    ).toBeVisible();
+    // Verify Held Items (row is not rendered when items list is empty)
+    if (details.heldItems !== undefined) {
+      await expect(
+        this.page.getByRole('row', { name: new RegExp(`Held Items.*${details.heldItems}`) })
+      ).toBeVisible();
+    }
   }
 
   async verifyPercentageStatsVisible(): Promise<void> {

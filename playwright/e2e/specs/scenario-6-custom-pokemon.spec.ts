@@ -34,7 +34,7 @@ test.describe('Scenario 6 - Custom Pokémon (mylahore)', () => {
       height: TestData.pokemon.mylahore.height,
       weight: TestData.pokemon.mylahore.weight,
       types: TestData.pokemon.mylahore.types,
-      heldItems: '',
+      // mylahore holds no items so the Held Items row is not rendered
     });
     await detailPage.verifyPercentageStatsVisible();
     await detailPage.verifyEvolutionChainVisible();
