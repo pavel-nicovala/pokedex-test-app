@@ -26,9 +26,8 @@ describe('matchCustomPokemonSearch', () => {
   });
 
   it('should return empty array for empty string', () => {
-    // Empty string prefix-matches everything — verifying current behaviour
     const results = matchCustomPokemonSearch('');
-    expect(results).toHaveLength(1);
+    expect(results).toEqual([]);
   });
 
   it('should not treat trailing % as a wildcard (raw query, no stripping needed)', () => {

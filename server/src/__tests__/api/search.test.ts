@@ -99,8 +99,7 @@ describe('GET /api/search', () => {
         .get('/api/search')
         .query({ query: 'pikachu', langId: 'invalid' });
 
-      // PokeAPI rejects NaN as a non-nullable Int, causing a 500
-      expect([200, 400, 500]).toContain(response.status);
+      expect(response.status).toBe(400);
     });
   });
 

@@ -21,10 +21,14 @@ const searchPokemonFetch = gqlFetch<SearchQueryParams, SearchData, PokemonSpecie
       }
     }
   }`,
-  variables: (req: Request) => ({
-    query: (req.query.query as string) + "%",
-    langId: req.query.langId ? parseInt(req.query.langId as string, 10) : 9,
-  }),
+  variables: (req: Request) => {
+    const rawLangId = req.query.langId as string | undefined;
+    const langId = rawLangId ? parseInt(rawLangId, 10) : 9;
+    if (isNaN(langId)) {
+      throw new Error("Invalid langId parameter: must be a number");
+    }
+    return { query: (req.query.query as string) + "%", langId };
+  },
   result: (data: SearchData) => data.species,
 });
 
@@ -37,7 +41,10 @@ export const searchPokemon = async (req: Request, res: Response): Promise<void> 
   try {
     const baseResults = await searchPokemonFetch(req);
     const custom = matchCustomPokemonSearch(query);
-    res.status(200).json([...baseResults, ...custom]);
+    // Deduplicate by id so a custom entry never appears twice if it shares a name with a PokéAPI entry
+    const seenIds = new Set(baseResults.map((p) => p.id));
+    const dedupedCustom = custom.filter((p) => !seenIds.has(p.id));
+    res.status(200).json([...baseResults, ...dedupedCustom]);
   } catch (error) {
     const err = error as Error;
     if (err instanceof BadRequestError) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PR comment body + gh CLI. Lives outside the workflow YAML so parsers do not treat
 # markdown [brackets], *asterisks, or :colons as YAML syntax.
-set -u
+set -euo pipefail
 
 if [ ! -s cursor-review.txt ]; then
   echo "No review output to post."

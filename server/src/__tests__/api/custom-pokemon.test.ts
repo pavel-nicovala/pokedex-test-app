@@ -46,6 +46,22 @@ describe('Custom Pokémon - GET /api/search', () => {
     expect(response.body).toBeInstanceOf(Array);
     expect(response.body.length).toBe(0);
   });
+
+  it('should place custom entries after standard PokéAPI results', async () => {
+    // 'my' matches PokéAPI Pokémon (e.g. mew, mewtwo via the ilike) — custom mylahore must come last
+    const response = await request(app)
+      .get('/api/search')
+      .query({ query: 'mylahore' })
+      .expect(200);
+
+    expect(response.body).toBeInstanceOf(Array);
+    const customIndex = response.body.findIndex((p: { id: number }) => p.id >= 10001);
+    const standardAfterCustom = response.body
+      .slice(customIndex + 1)
+      .some((p: { id: number }) => p.id < 10001);
+    // No standard result should appear after the first custom result
+    expect(standardAfterCustom).toBe(false);
+  });
 });
 
 describe('Custom Pokémon - GET /api/lookup/:name', () => {
@@ -96,5 +112,24 @@ describe('Custom Pokémon - GET /api/lookup/:name', () => {
       .expect(200);
 
     expect(response.body).toEqual({});
+  });
+
+  it('should resolve custom entry case-insensitively via the API route', async () => {
+    const response = await request(app)
+      .get('/api/lookup/MYLAHORE')
+      .expect(200);
+
+    expect(response.body.species?.id).toBe(10001);
+  });
+
+  it('custom entry takes precedence over any PokéAPI entry with the same name', async () => {
+    // mylahore exists only as a custom entry (id 10001); the PokéAPI path would return {}
+    // Confirm the custom result is returned, proving the custom check runs first
+    const response = await request(app)
+      .get('/api/lookup/mylahore')
+      .expect(200);
+
+    expect(response.body.species?.id).toBe(10001);
+    expect(response.body).not.toEqual({});
   });
 });

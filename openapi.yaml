@@ -106,7 +106,9 @@ paths:
         - name: name
           in: path
           required: true
-          description: The exact name of the Pokémon (case-sensitive)
+          description: |
+            The Pokémon name to look up. Custom entries (id >= 10001) are matched
+            case-insensitively; standard PokéAPI entries require an exact lowercase match.
           schema:
             type: string
             example: "pikachu"
