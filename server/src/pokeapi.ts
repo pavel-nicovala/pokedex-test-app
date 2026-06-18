@@ -22,6 +22,26 @@ const gqlRequest = async <T = any>(
   return data as T;
 };
 
+export class BadRequestError extends Error {}
+
+/** Like gqlRoute but returns data instead of writing to the response — use in handlers that need to post-process results. */
+export const gqlFetch = <TVariables = any, TData = any, TResult = any>({
+  query,
+  variables = () => ({} as TVariables),
+  result = (x: TData) => x as unknown as TResult,
+}: GqlRouteConfig<TVariables, TData, TResult>) => {
+  return async (req: Request): Promise<TResult> => {
+    let v: TVariables;
+    try {
+      v = variables(req);
+    } catch (error) {
+      throw new BadRequestError((error as Error).message);
+    }
+    const data = await gqlRequest<TData>(query, v as GraphQLVariables);
+    return result(data);
+  };
+};
+
 export const gqlRoute = <TVariables = any, TData = any, TResult = any>({
   query,
   variables = () => ({} as TVariables),

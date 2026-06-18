@@ -6,6 +6,12 @@ export interface PokemonSpecies {
   }>;
 }
 
+export const CUSTOM_POKEMON_ID_START = 10001;
+
+/** Returns true for custom (non-PokéAPI) entries injected by the server (id >= CUSTOM_POKEMON_ID_START). */
+export const isCustomPokemon = (species: PokemonSpecies): boolean =>
+  species.id >= CUSTOM_POKEMON_ID_START;
+
 export interface PokemonType {
   names: {
     name: string;
