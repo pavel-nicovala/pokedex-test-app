@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSearch } from "./api/search";
+import { isCustomPokemon } from "./types";
 import { Sprite } from "./Sprite";
 
 export const Search: React.FC = () => {
@@ -53,6 +54,9 @@ export const Search: React.FC = () => {
                 <Link to={`/pokemon/${name}`}>
                   <Sprite id={id} displayName={localised[0]?.name} size={96} />
                   {localised[0]?.name}
+                  {isCustomPokemon({ id, name, localised }) && (
+                    <span data-testid="custom-badge" className="nes-text is-primary"> ★</span>
+                  )}
                 </Link>
               </li>
             ))}

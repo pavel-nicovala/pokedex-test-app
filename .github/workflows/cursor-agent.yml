@@ -38,20 +38,76 @@ jobs:
             > pr-diff.txt
           echo "Diff size: $(wc -l < pr-diff.txt) lines"
 
+      - name: Extract JIRA ticket ID
+        id: jira-id
+        run: |
+          # Match e.g. PROJ-123 in PR title first, then branch name
+          TICKET=$(echo "${{ github.event.pull_request.title }}" | grep -oE '[A-Z]+-[0-9]+' | head -1)
+          if [ -z "$TICKET" ]; then
+            TICKET=$(echo "${{ github.head_ref }}" | grep -oE '[A-Z]+-[0-9]+' | head -1)
+          fi
+          echo "ticket=$TICKET" >> $GITHUB_OUTPUT
+          if [ -n "$TICKET" ]; then
+            echo "Found JIRA ticket: $TICKET"
+          else
+            echo "No JIRA ticket ID found in PR title or branch name"
+          fi
+
+      - name: Fetch JIRA requirements
+        if: steps.jira-id.outputs.ticket != ''
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          TICKET="${{ steps.jira-id.outputs.ticket }}"
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Basic $(echo -n "$JIRA_USER_EMAIL:$JIRA_API_TOKEN" | base64 -w0)" \
+            -H "Accept: application/json" \
+            "$JIRA_BASE_URL/rest/api/2/issue/$TICKET?fields=summary,description,priority,status" 2>/dev/null) || true
+
+          if [ -n "$RESPONSE" ] && echo "$RESPONSE" | jq -e '.fields' > /dev/null 2>&1; then
+            SUMMARY=$(echo "$RESPONSE" | jq -r '.fields.summary // "(no summary)"')
+            DESCRIPTION=$(echo "$RESPONSE" | jq -r '.fields.description // "(no description)"')
+            STATUS=$(echo "$RESPONSE" | jq -r '.fields.status.name // ""')
+            PRIORITY=$(echo "$RESPONSE" | jq -r '.fields.priority.name // ""')
+
+            {
+              echo "JIRA Ticket: $TICKET"
+              [ -n "$STATUS" ]   && echo "Status: $STATUS"
+              [ -n "$PRIORITY" ] && echo "Priority: $PRIORITY"
+              echo "Summary: $SUMMARY"
+              echo ""
+              echo "Description / Requirements:"
+              echo "$DESCRIPTION"
+            } > jira-requirements.txt
+            echo "Fetched requirements for $TICKET"
+          else
+            echo "::warning::Could not fetch JIRA ticket $TICKET — check JIRA_BASE_URL, JIRA_USER_EMAIL, JIRA_API_TOKEN secrets"
+            touch jira-requirements.txt
+          fi
+
       - name: Install Cursor CLI
         run: |
           curl -fsSL https://cursor.com/install | bash
-          # Add every likely install location to PATH
           echo "$HOME/.cursor/bin" >> $GITHUB_PATH
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          # Print where the binary actually landed for debugging
-          find "$HOME" -name "agent" -type f 2>/dev/null | head -5
 
       - name: Build prompt file
         run: |
           cat > prompt.txt << 'PROMPT_EOF'
           You are reviewing a pull request for a React + Express PokeDex monorepo.
           Project conventions are in AGENTS.md and .cursor/rules/.
+          PROMPT_EOF
+
+          if [ -s jira-requirements.txt ]; then
+            cat >> prompt.txt << 'PROMPT_EOF'
+          The following JIRA ticket describes the requirements for this PR:
+          PROMPT_EOF
+            cat jira-requirements.txt >> prompt.txt
+            echo "" >> prompt.txt
+          fi
+
+          cat >> prompt.txt << 'PROMPT_EOF'
           Here is the full diff of this PR:
           PROMPT_EOF
           cat pr-diff.txt >> prompt.txt
@@ -60,6 +116,16 @@ jobs:
           - Do API changes update server, openapi.yaml, AND client together?
           - Are TypeScript types consistent between client and server?
           - Are there obvious bugs or missing test coverage?
+          PROMPT_EOF
+
+          if [ -s jira-requirements.txt ]; then
+            cat >> prompt.txt << 'PROMPT_EOF'
+          - Does the implementation satisfy the requirements stated in the JIRA ticket?
+          - Are any acceptance criteria unmet or only partially addressed?
+          PROMPT_EOF
+          fi
+
+          cat >> prompt.txt << 'PROMPT_EOF'
           Write a concise review (bullet points for issues, a short summary of what looks good). Do NOT modify any files.
           PROMPT_EOF
 
@@ -69,6 +135,7 @@ jobs:
         run: |
           AGENT_BIN=$(which agent 2>/dev/null || find "$HOME" -name "agent" -type f 2>/dev/null | head -1)
           echo "Agent binary: $AGENT_BIN"
+          echo "::notice::Running Cursor Agent (may take 1-3 minutes)..."
           timeout 480 "$AGENT_BIN" -p --trust --output-format text "$(cat prompt.txt)" 2>&1 | tee cursor-review.txt || true
         continue-on-error: true
 
@@ -82,23 +149,9 @@ jobs:
         if: github.event_name == 'pull_request' && hashFiles('cursor-review.txt') != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          REVIEW=$(cat cursor-review.txt)
-          if [ -z "$REVIEW" ]; then
-            echo "No review output to post."
-            exit 0
-          fi
-          BODY="## 🤖 Cursor Agent Review
-
-$REVIEW
-
----
-*Generated by [Cursor Agent](.github/workflows/cursor-agent.yml)*"
-          # Delete any previous Cursor Agent review comment to avoid duplicates
-          gh pr view ${{ github.event.pull_request.number }} --json comments \
-            --jq '.comments[] | select(.body | startswith("## 🤖 Cursor Agent Review")) | .databaseId' \
-            | xargs -I{} gh api -X DELETE repos/${{ github.repository }}/issues/comments/{} || true
-          gh pr comment ${{ github.event.pull_request.number }} --body "$BODY"
+          PR_NUM: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: bash .github/scripts/post-cursor-review.sh
 
       - name: Upload Cursor review
         uses: actions/upload-artifact@v4

@@ -36,6 +36,12 @@ When making changes, follow these workflows so client and server stay in sync.
 - **Server**: Express router under `/api`, CORS enabled (see `server/src/index.ts`). Use `PORT` env for the port.
 - **Tests**: API tests in `server/src/__tests__/api/`, E2E in `playwright/` and `cypress/`. Prefer Playwright for new E2E.
 
+## Cursor Agent (GitHub Actions)
+
+- Workflow: `.github/workflows/cursor-agent.yml` — runs on PRs to `main` / `master` / `develop` and can be triggered with `workflow_dispatch` once the file exists on the default branch.
+- **PR comments**: posting the review is done by `.github/scripts/post-cursor-review.sh` (not inline in the YAML) so GitHub’s parser does not mis-read markdown `[links]`, `*emphasis*`, or `---` inside `run:` blocks.
+- Secrets: `CURSOR_API_KEY` (Cursor dashboard). `GITHUB_TOKEN` is automatic for `gh pr comment`.
+
 ## Commands to remember
 
 - Start app: `npm start`

@@ -93,14 +93,22 @@ describe('GET /api/search', () => {
       expect(response.body.error).toHaveProperty('message');
     });
 
-    it('should handle invalid langId gracefully', async () => {
-      // The API should handle invalid langId - might return 400 or use default
+    it('should return 400 for invalid langId', async () => {
       const response = await request(app)
         .get('/api/search')
         .query({ query: 'pikachu', langId: 'invalid' });
 
-      // Could be 400 or 200 depending on implementation
-      expect([200, 400]).toContain(response.status);
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 for whitespace-only query', async () => {
+      const response = await request(app)
+        .get('/api/search')
+        .query({ query: '   ' })
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toHaveProperty('message');
     });
   });
 

@@ -9,11 +9,20 @@ export const TestData = {
       types: 'water, ice',
       heldItems: 'mystic-water',
     },
+    mylahore: {
+      name: 'mylahore',
+      displayName: 'Mylahore',
+      dexNumber: '10001',
+      height: '18',
+      weight: '660',
+      types: 'psychic, dragon',
+    },
   },
   searchTerms: {
     valid: 'lapras',
     invalid: '$',
     notFound: 'thiswillnotreturnresults',
+    custom: 'mylahore',
   },
   errorMessages: {
     invalidSearchTerm: 'Invalid search term',

@@ -11,7 +11,7 @@
     "build": "run-p build:*",
     "build:client": "npm -w client run build",
     "build:server": "npm -w server run build",
-    "serve": "npm run build && run-p serve:*",
+    "serve": "REACT_APP_API_URL=http://localhost:${PORT:-3001} npm run build && run-p serve:*",
     "serve:client": "npx serve -s client/build -l 3000",
     "serve:server": "npm -w server start",
     "start": "run-p start:*",
