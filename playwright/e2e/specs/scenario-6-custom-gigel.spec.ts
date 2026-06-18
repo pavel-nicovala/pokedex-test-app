@@ -42,7 +42,6 @@ test.describe('Scenario 6 - Custom Pokémon Gigel', () => {
       height: TestData.pokemon.gigel.height,
       weight: TestData.pokemon.gigel.weight,
       types: TestData.pokemon.gigel.types,
-      heldItems: TestData.pokemon.gigel.heldItems,
     });
   });
 

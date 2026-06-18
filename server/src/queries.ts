@@ -115,4 +115,3 @@ export const lookupPokemon = async (req: Request, res: Response): Promise<void> 
   }
   await lookupPokemonBase(req, res);
 };
-

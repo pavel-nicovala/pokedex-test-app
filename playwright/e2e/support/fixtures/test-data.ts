@@ -9,20 +9,28 @@ export const TestData = {
       types: 'water, ice',
       heldItems: 'mystic-water',
     },
+    mylahore: {
+      name: 'mylahore',
+      displayName: 'Mylahore',
+      dexNumber: '10001',
+      height: '18',
+      weight: '660',
+      types: 'psychic, dragon',
+    },
     gigel: {
       name: 'gigel',
       displayName: 'Gigel',
-      dexNumber: '10001',
+      dexNumber: '10002',
       height: '12',
       weight: '450',
       types: 'fire, fighting',
-      heldItems: 'None',
     },
   },
   searchTerms: {
     valid: 'lapras',
     invalid: '$',
     notFound: 'thiswillnotreturnresults',
+    custom: 'mylahore',
     customPokemon: 'gigel',
   },
   errorMessages: {
@@ -33,4 +41,3 @@ export const TestData = {
     search: 'Pokédex Search',
   },
 } as const;
-

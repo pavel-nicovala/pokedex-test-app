@@ -3,9 +3,48 @@ import { PokemonSpecies, PokemonDetails } from "./types.js";
 export const CUSTOM_POKEMON_ID_START = 10001;
 
 export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: PokemonDetails }> = {
-  gigel: {
+  mylahore: {
     species: {
       id: CUSTOM_POKEMON_ID_START,
+      name: "mylahore",
+      localised: [{ name: "Mylahore" }],
+    },
+    details: {
+      height: 18,
+      weight: 660,
+      species: {
+        id: CUSTOM_POKEMON_ID_START,
+        name: "mylahore",
+        is_baby: false,
+        is_legendary: false,
+        is_mythical: true,
+        base_happiness: 100,
+        capture_rate: 3,
+        gender_rate: -1,
+        has_gender_differences: false,
+        forms_switchable: false,
+        localised: [{ name: "Mylahore" }],
+        evolution_chain: {
+          evolutions: [
+            { id: CUSTOM_POKEMON_ID_START, name: "mylahore", localised: [{ name: "Mylahore" }] },
+          ],
+        },
+        flavor_text: [
+          {
+            id: 1,
+            flavor_text:
+              "A mythical Pokémon said to have emerged from the first lines of code ever written. " +
+              "Its presence causes nearby software bugs to spontaneously resolve themselves.",
+          },
+        ],
+      },
+      types: [{ names: { name: "psychic" } }, { names: { name: "dragon" } }],
+      items: [],
+    },
+  },
+  gigel: {
+    species: {
+      id: CUSTOM_POKEMON_ID_START + 1,
       name: "gigel",
       localised: [{ name: "Gigel" }],
     },
@@ -13,7 +52,7 @@ export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: 
       height: 12,
       weight: 450,
       species: {
-        id: CUSTOM_POKEMON_ID_START,
+        id: CUSTOM_POKEMON_ID_START + 1,
         name: "gigel",
         is_baby: false,
         is_legendary: true,
@@ -26,7 +65,7 @@ export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: 
         localised: [{ name: "Gigel" }],
         evolution_chain: {
           evolutions: [
-            { id: CUSTOM_POKEMON_ID_START, name: "gigel", localised: [{ name: "Gigel" }] },
+            { id: CUSTOM_POKEMON_ID_START + 1, name: "gigel", localised: [{ name: "Gigel" }] },
           ],
         },
         flavor_text: [
