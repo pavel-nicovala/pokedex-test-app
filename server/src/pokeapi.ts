@@ -29,6 +29,7 @@ const gqlRequest = async <T = any>(
   return data as T;
 };
 
+/** Like gqlRoute but returns data instead of writing to the response — use in handlers that need to post-process results. */
 export const gqlFetch = <TVariables = any, TData = any, TResult = any>({
   query,
   variables = () => ({} as TVariables),

@@ -17,12 +17,21 @@ export const TestData = {
       weight: '660',
       types: 'psychic, dragon',
     },
+    gigel: {
+      name: 'gigel',
+      displayName: 'Gigel',
+      dexNumber: '10002',
+      height: '12',
+      weight: '450',
+      types: 'fire, fighting',
+    },
   },
   searchTerms: {
     valid: 'lapras',
     invalid: '$',
     notFound: 'thiswillnotreturnresults',
     custom: 'mylahore',
+    customPokemon: 'gigel',
   },
   errorMessages: {
     invalidSearchTerm: 'Invalid search term',
@@ -32,4 +41,3 @@ export const TestData = {
     search: 'Pokédex Search',
   },
 } as const;
-

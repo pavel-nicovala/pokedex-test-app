@@ -2,22 +2,44 @@ import { describe, it, expect } from 'vitest';
 import { matchCustomPokemonSearch, lookupCustomPokemon } from '../../custom-pokemon.js';
 
 describe('matchCustomPokemonSearch', () => {
-  it('should match by full name', () => {
-    const results = matchCustomPokemonSearch('mylahore');
-    expect(results).toHaveLength(1);
-    expect(results[0].name).toBe('mylahore');
+  describe('mylahore', () => {
+    it('should match by full name', () => {
+      const results = matchCustomPokemonSearch('mylahore');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('mylahore');
+    });
+
+    it('should match by prefix', () => {
+      const results = matchCustomPokemonSearch('myla');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('mylahore');
+    });
+
+    it('should match case-insensitively', () => {
+      const results = matchCustomPokemonSearch('MYLAHORE');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('mylahore');
+    });
   });
 
-  it('should match by prefix', () => {
-    const results = matchCustomPokemonSearch('myla');
-    expect(results).toHaveLength(1);
-    expect(results[0].name).toBe('mylahore');
-  });
+  describe('gigel', () => {
+    it('should match by full name', () => {
+      const results = matchCustomPokemonSearch('gigel');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('gigel');
+    });
 
-  it('should match case-insensitively', () => {
-    const results = matchCustomPokemonSearch('MYLAHORE');
-    expect(results).toHaveLength(1);
-    expect(results[0].name).toBe('mylahore');
+    it('should match by prefix', () => {
+      const results = matchCustomPokemonSearch('gig');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('gigel');
+    });
+
+    it('should match case-insensitively', () => {
+      const results = matchCustomPokemonSearch('GIGEL');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('gigel');
+    });
   });
 
   it('should return empty array when query does not match any custom pokemon', () => {
@@ -31,24 +53,36 @@ describe('matchCustomPokemonSearch', () => {
   });
 
   it('should not treat trailing % as a wildcard (raw query, no stripping needed)', () => {
-    // The function receives the raw query value; a literal % should not match
     const results = matchCustomPokemonSearch('mylahore%');
     expect(results).toEqual([]);
   });
 });
 
 describe('lookupCustomPokemon', () => {
-  it('should return details for an existing custom pokemon', () => {
+  it('should return details for mylahore', () => {
     const result = lookupCustomPokemon('mylahore');
     expect(result).not.toBeNull();
     expect(result!.species.name).toBe('mylahore');
     expect(result!.species.id).toBe(10001);
   });
 
-  it('should perform a case-insensitive lookup', () => {
+  it('should return details for gigel', () => {
+    const result = lookupCustomPokemon('gigel');
+    expect(result).not.toBeNull();
+    expect(result!.species.name).toBe('gigel');
+    expect(result!.species.id).toBe(10002);
+  });
+
+  it('should perform a case-insensitive lookup for mylahore', () => {
     const result = lookupCustomPokemon('MYLAHORE');
     expect(result).not.toBeNull();
     expect(result!.species.name).toBe('mylahore');
+  });
+
+  it('should perform a case-insensitive lookup for gigel', () => {
+    const result = lookupCustomPokemon('GIGEL');
+    expect(result).not.toBeNull();
+    expect(result!.species.name).toBe('gigel');
   });
 
   it('should return null for an unknown name', () => {
