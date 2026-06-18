@@ -49,4 +49,3 @@ When making changes, follow these workflows so client and server stay in sync.
 - API tests: `cd server && npm test`
 - E2E: `npm run test:playwright`
 - Install (with peer deps): `npm run pre-install` or `npm install --legacy-peer-deps`
--

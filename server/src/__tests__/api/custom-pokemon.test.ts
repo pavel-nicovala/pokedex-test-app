@@ -48,18 +48,29 @@ describe('Custom Pokémon - GET /api/search', () => {
   });
 
   it('should place custom entries after standard PokéAPI results', async () => {
-    // 'my' matches PokéAPI Pokémon (e.g. mew, mewtwo via the ilike) — custom mylahore must come last
+    // 'm' matches many standard PokéAPI Pokémon (machop, magikarp, mew, etc.) AND 'mylahore',
+    // so both result types will be present and ordering can be verified non-vacuously.
     const response = await request(app)
       .get('/api/search')
-      .query({ query: 'mylahore' })
+      .query({ query: 'm' })
       .expect(200);
 
     expect(response.body).toBeInstanceOf(Array);
+
+    const standardResults = response.body.filter((p: { id: number }) => p.id < 10001);
     const customIndex = response.body.findIndex((p: { id: number }) => p.id >= 10001);
+
+    // Both standard and custom results must be present for the ordering assertion to be meaningful
+    expect(standardResults.length).toBeGreaterThan(0);
+    expect(customIndex).toBeGreaterThan(-1);
+
+    // All standard entries must come before the first custom entry
+    expect(customIndex).toBeGreaterThanOrEqual(standardResults.length);
+
+    // No standard result should appear after the first custom result
     const standardAfterCustom = response.body
       .slice(customIndex + 1)
       .some((p: { id: number }) => p.id < 10001);
-    // No standard result should appear after the first custom result
     expect(standardAfterCustom).toBe(false);
   });
 });

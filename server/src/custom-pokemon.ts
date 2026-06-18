@@ -1,9 +1,11 @@
 import { PokemonSpecies, PokemonDetails } from "./types.js";
 
+export const CUSTOM_POKEMON_ID_START = 10001;
+
 export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: PokemonDetails }> = {
   mylahore: {
     species: {
-      id: 10001,
+      id: CUSTOM_POKEMON_ID_START,
       name: "mylahore",
       localised: [{ name: "Mylahore" }],
     },
@@ -11,7 +13,7 @@ export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: 
       height: 18,
       weight: 660,
       species: {
-        id: 10001,
+        id: CUSTOM_POKEMON_ID_START,
         name: "mylahore",
         is_baby: false,
         is_legendary: false,
@@ -24,7 +26,7 @@ export const CUSTOM_POKEMON: Record<string, { species: PokemonSpecies; details: 
         localised: [{ name: "Mylahore" }],
         evolution_chain: {
           evolutions: [
-            { id: 10001, name: "mylahore", localised: [{ name: "Mylahore" }] },
+            { id: CUSTOM_POKEMON_ID_START, name: "mylahore", localised: [{ name: "Mylahore" }] },
           ],
         },
         flavor_text: [

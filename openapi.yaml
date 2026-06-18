@@ -169,6 +169,39 @@ paths:
                       - names:
                           name: electric
                     items: []
+                mylahore:
+                  summary: Mylahore (custom Pokémon entry, id >= 10001)
+                  value:
+                    height: 18
+                    weight: 660
+                    species:
+                      id: 10001
+                      name: mylahore
+                      is_baby: false
+                      is_legendary: false
+                      is_mythical: true
+                      base_happiness: 100
+                      capture_rate: 3
+                      gender_rate: -1
+                      has_gender_differences: false
+                      forms_switchable: false
+                      localised:
+                        - name: Mylahore
+                      evolution_chain:
+                        evolutions:
+                          - id: 10001
+                            name: mylahore
+                            localised:
+                              - name: Mylahore
+                      flavor_text:
+                        - id: 1
+                          flavor_text: "A mythical Pokémon said to have emerged from the first lines of code ever written. Its presence causes nearby software bugs to spontaneously resolve themselves."
+                    types:
+                      - names:
+                          name: psychic
+                      - names:
+                          name: dragon
+                    items: []
         '400':
           description: Bad request - Invalid Pokémon name parameter
           content:
